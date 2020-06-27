@@ -6,8 +6,8 @@ using UnityEngine.Analytics;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float moveSpeed = 10f;
-    public float jumpForce = 10f;
+    [Range(0, 100f)] public float moveSpeed = 10f;
+    [Range(0, 100f)] public float jumpForce = 10f;
     private bool leftMovement; 
 
     private bool isGrounded;
@@ -49,6 +49,8 @@ public class PlayerMovement : MonoBehaviour
 
         PlayerAnimation.SetFloat("Speed", Mathf.Abs(horizontalMovement));
         player.velocity = new Vector2( horizontalMovement, player.velocity.y );
+
+        // Debug.Log(player.position);
     }
 
     private void flipPlayer( ) {
