@@ -16,7 +16,7 @@ public class FrogAI : MonoBehaviour
 
     private bool isJumping = false;
     private bool isOnLeft = true;
-    
+    private bool isAlive = true;
     private void Start() {
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
         frog = this.gameObject.GetComponent<Rigidbody2D>();
@@ -29,31 +29,30 @@ public class FrogAI : MonoBehaviour
         float frogPositionX = this.frog.position.x;
         float playerEnemyDiference = playerPositionX - frogPositionX;
 
-        if(playerEnemyDiference > 0 && isOnLeft)
-            this.flipFrog();
-        else if(playerEnemyDiference < 0 && !isOnLeft)
+        Debug.Log("VElocity" + frog.velocity);
+
+
+        if(playerEnemyDiference > 0 && isOnLeft || playerEnemyDiference < 0 && !isOnLeft)
             this.flipFrog();
     }
+
     void flipFrog() {
-        Vector3 frog = this.transform.localScale;
-        frog.x *= -1;
-        this.transform.localScale = frog;
+        Vector3 Frog = this.transform.localScale;
+        Frog.x *= -1;
+        this.transform.localScale = Frog;
 
         this.isOnLeft = !this.isOnLeft;
     }
 
-    void moveFrog() {
+    void moveAndAnimateFrog() {
         float playerPositionX = player.position.x;
         float frogPositionX = this.frog.position.x;
         float playerEnemyDiference = playerPositionX - frogPositionX;
-
-        Debug.Log(playerEnemyDiference);
-
         
         if(playerEnemyDiference > 0) 
-            frog.velocity = new Vector2(frogPositionX + frogMovement * frogSpeed, jumpSpeed);
+            frog.velocity = new Vector2( frogMovement * frogSpeed, jumpSpeed );  //Player will go to the right
         else if (playerEnemyDiference < 0)
-            frog.velocity = new Vector2(frogPositionX - frogMovement * frogSpeed, jumpSpeed);
+            frog.velocity = new Vector2( -frogMovement * frogSpeed, jumpSpeed ); //Player will go to the left
 
     }
 
@@ -61,9 +60,9 @@ public class FrogAI : MonoBehaviour
     IEnumerator frogController() {
         // Jump animation
         FrogAnimation.SetBool("Jump", true);
-        moveFrog();
+        moveAndAnimateFrog();
         // force system to wait x secounds
-        yield return new WaitForSeconds(4f);
+        yield return new WaitForSeconds(3f);
         // end the animation
         FrogAnimation.SetBool("Jump", false);
         // then get ready for the next loop
