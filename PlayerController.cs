@@ -1,9 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 using UnityEngine.UI;
-
 
 public class PlayerController : MonoBehaviour
 {
@@ -26,18 +24,15 @@ public class PlayerController : MonoBehaviour
 
     //Checking if player collider with the frog
     private void OnTriggerEnter2D(Collider2D other) {
-        if(other.CompareTag("Frog")) {
+        if(other.CompareTag("Frog") && this.damage == false) {
+            this.damage = true;
             takeDamage(5);
         }
     }
 
     private void OnTriggerExit2D(Collider2D other) {
-        
-    }
-    void OnCollisionEnter2D(Collision2D collision) {
-        foreach (ContactPoint2D contact in collision.contacts) {
-            Debug.DrawRay(contact.point, contact.normal, Color.white);
-        }
+        if(other.CompareTag("Frog"))
+            this.damage = false;
     }
 
     public void takeDamage(int damage) {
