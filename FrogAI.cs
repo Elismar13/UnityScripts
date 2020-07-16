@@ -5,8 +5,13 @@ using UnityEngine;
 public class FrogAI : MonoBehaviour
 {
     //This is the 'frog' object
-    public Rigidbody2D frog;
+    private Rigidbody2D frog;
     public Animator FrogAnimation;
+    public LayerMask WhatIsGround;
+    public Transform frogFeet;
+
+    public float checkRadius;
+
     //This is the player object
     private Transform player;
     
@@ -14,9 +19,10 @@ public class FrogAI : MonoBehaviour
     [Range(1f, 10f)]public float frogMovement;
     [Range(1f, 10f)]public float frogSpeed;
 
-    private bool isJumping = false;
-    private bool isOnLeft = true;
-    private bool isAlive = true;
+    private bool isJumping  = false;
+    private bool isOnLeft   = true;
+    private bool isGrounded = true;
+
     private void Start() {
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
         frog = this.gameObject.GetComponent<Rigidbody2D>();
@@ -24,19 +30,29 @@ public class FrogAI : MonoBehaviour
         StartCoroutine(frogController());
     }
 
+    private void Update() {
+        this.isGrounded = Physics2D.OverlapCircle( frogFeet.position, checkRadius, WhatIsGround );
+
+        if(this.isGrounded) {
+            this.isJumping = false;
+            FrogAnimation.SetBool("Jump", false);
+        }
+    }
+
     private void LateUpdate() {
         float playerPositionX = player.position.x;
         float frogPositionX = this.frog.position.x;
         float playerEnemyDiference = playerPositionX - frogPositionX;
 
-        Debug.Log("VElocity" + frog.velocity);
+        //Debug.Log("VElocity" + frog.velocity);
 
 
         if(playerEnemyDiference > 0 && isOnLeft || playerEnemyDiference < 0 && !isOnLeft)
             this.flipFrog();
+
     }
 
-    void flipFrog() {
+    private void flipFrog() {
         Vector3 Frog = this.transform.localScale;
         Frog.x *= -1;
         this.transform.localScale = Frog;
@@ -44,7 +60,7 @@ public class FrogAI : MonoBehaviour
         this.isOnLeft = !this.isOnLeft;
     }
 
-    void moveAndAnimateFrog() {
+    private void moveAndAnimateFrog() {
         float playerPositionX = player.position.x;
         float frogPositionX = this.frog.position.x;
         float playerEnemyDiference = playerPositionX - frogPositionX;
@@ -59,12 +75,13 @@ public class FrogAI : MonoBehaviour
     // move frog in a x secounds interval
     IEnumerator frogController() {
         // Jump animation
-        FrogAnimation.SetBool("Jump", true);
+        this.isJumping = true;
+        if(!FrogAnimation.GetBool("Jump"))
+            FrogAnimation.SetBool("Jump", true);
         moveAndAnimateFrog();
         // force system to wait x secounds
         yield return new WaitForSeconds(3f);
         // end the animation
-        FrogAnimation.SetBool("Jump", false);
         // then get ready for the next loop
         StartCoroutine(frogController());
     }
