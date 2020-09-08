@@ -11,6 +11,10 @@ public class Movement : MonoBehaviour
     private bool isGrounded;
     private bool isJumping;
     private bool isCrouched;
+
+    private bool firstJump;
+    private bool jumpEventFlag;
+    private bool nextJump;
     
     public Transform feetPos;
     public LayerMask whatIsGround;
@@ -21,6 +25,9 @@ public class Movement : MonoBehaviour
         player = GetComponent<Rigidbody2D>();
         this.isJumping = false;
         this.isCrouched = false;
+        this.firstJump = false;
+        this.jumpEventFlag = false;
+        this.nextJump = false;
     }
 
     void Update() {
@@ -30,8 +37,20 @@ public class Movement : MonoBehaviour
             isJumping = false;
         }
 
-        if (!isJumping && Input.GetKey(KeyCode.Space)) {
-            isJumping = true;
+        bool keyPressed = Input.GetKey(KeyCode.Space);
+        jumpEventFlag = !keyPressed;
+
+        if(jumpEventFlag && !nextJump) {
+            this.nextJump = true;
+        }
+
+        if(!isJumping && keyPressed) {
+            this.isJumping = this.firstJump = true;
+            this.nextJump = false;
+            player.velocity = Vector2.up * jumpForce;
+        } 
+        else if(isJumping && firstJump && nextJump && keyPressed) {
+            this.nextJump = this.firstJump = false;
             player.velocity = Vector2.up * jumpForce;
         }
     }
